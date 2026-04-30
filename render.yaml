@@ -2,7 +2,7 @@ services:
   - type: web
     name: syncpad-server
     env: node
-    rootDir: server
+    rootDir: Server
     buildCommand: "npm install"
     startCommand: "npm start"
     envVars:

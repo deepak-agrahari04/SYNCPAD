@@ -6,10 +6,17 @@
 
 
 /* --- Global Styles & Default Animated Background --- */
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
 body {
   font-family: 'Inter', sans-serif;
   background-color: #020617; /* Default dark background */
-  overflow: hidden;
 }
 
 body::before {
@@ -60,5 +67,44 @@ html.dark select option {
 }
 
 /* Ensure CodeMirror stretches properly */
-.cm-editor { height: 100%; }
+.cm-editor {
+  height: 100%;
+  width: 100%;
+}
+
+.cm-scroller {
+  height: 100%;
+}
+
+/* --- Floating Emoji Reactions --- */
+@keyframes floatReaction {
+  0% { transform: translateY(0) scale(0.5); opacity: 0; }
+  10% { transform: translateY(-20vh) scale(1.5); opacity: 1; }
+  100% { transform: translateY(-100vh) scale(1); opacity: 0; }
+}
+
+.floating-emoji {
+  position: absolute;
+  bottom: 0;
+  font-size: 3.5rem;
+  pointer-events: none;
+  z-index: 100;
+  animation: floatReaction 3s ease-out forwards;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+}
+
+/* --- Chat Panel Sliding Animation --- */
+.chat-panel {
+  transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  z-index: 50;
+  opacity: 0; /* Default closed state */
+}
+.chat-panel.open {
+  transform: translateX(0);
+  opacity: 1;
+}
+.chat-panel.closed {
+  transform: translateX(100%);
+  pointer-events: none;
+}
 
