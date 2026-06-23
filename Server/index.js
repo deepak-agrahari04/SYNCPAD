@@ -77,9 +77,13 @@ app.post("/api/execute", async (req, res) => {
     const pistonData = await executeCodeWithPiston({ language, code });
     res.json(pistonData);
   } catch (error) {
-    const status = error.statusCode || 500;
-    res.status(status).json({ run: { output: "Error running code: " + error.message } });
-  }
+  console.error("STATUS:", error.response?.status);
+  console.error("DATA:", error.response?.data);
+
+  res.status(500).json({
+    output: JSON.stringify(error.response?.data || error.message)
+  });
+}
 });
 
 // Backwards-compatible endpoint used by the current frontend.
@@ -90,16 +94,29 @@ app.post('/api/run', async (req, res) => {
     const pistonData = await executeCodeWithPiston({ language, code });
     res.json({ output: buildPistonOutput(pistonData), raw: pistonData });
   } catch (error) {
-    const status = error.statusCode || 500;
-    res.status(status).json({ output: "Error running code: " + error.message });
-  }
+  console.error("STATUS:", error.response?.status);
+  console.error("DATA:", error.response?.data);
+  console.error("MESSAGE:", error.message);
+
+  const status = error.response?.status || 500;
+
+  res.status(status).json({
+    output: JSON.stringify(error.response?.data || error.message)
+  });
+}
 });
 
 async function start() {
   // Use dynamic import so Node loads the ESM entrypoints (the CJS build currently
   // trips on Node's ESM/CJS rules under recent Node versions).
-  const { setupWSConnection } = await import('@y/websocket-server/utils');
+  const path = require('path');
 
+const utilsPath = path.resolve(
+  __dirname,
+  'node_modules/y-websocket/bin/utils.js'
+);
+
+const { setupWSConnection } = await import(`file:///${utilsPath.replace(/\\/g, '/')}`);
   // --- Yjs WebSocket endpoint (y-websocket protocol) ---
   // Client connects to: ws(s)://<host>/yjs/<roomId>
   // We strip the `/yjs` prefix before handing off so the doc name is just `<roomId>`.
